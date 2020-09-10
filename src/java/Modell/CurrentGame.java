@@ -1,14 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Modell;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,15 +15,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.json.JSONObject;
 
-/**
- *
- * @author solya
- */
 @Entity
 @Table(name = "current_game")
 @XmlRootElement
@@ -106,6 +104,78 @@ public class CurrentGame implements Serializable {
     public void setUserId(User userId) {
         this.userId = userId;
     }
+    
+    //Új játékos létrehozása
+    public static boolean addNewPlayer(Integer userId, String color, Integer balance,Integer sumBalance, EntityManager em){
+        try{
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("addNewPlayer");
+            spq.registerStoredProcedureParameter("userIdIN", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("colorIN", String.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("balanceIN", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("sumBalanceIN", Integer.class, ParameterMode.IN);
+            
+            spq.setParameter("userIdIN", userId);
+            spq.setParameter("colorIN", color);
+            spq.setParameter("balanceIN", balance);
+            spq.setParameter("sumBalanceIN", sumBalance);
+            
+            spq.execute();
+            em.close();
+            return true;
+        }
+        catch(Exception ex){
+            return false;
+        }
+    
+    }
+    
+    
+    //Összes játékos kilistázása    
+    public static List<CurrentGame> selectAllPlayer(EntityManager em){
+        List<CurrentGame> players = new ArrayList();
+        StoredProcedureQuery tarolt = em.createStoredProcedureQuery("selectAllPlayer");
+        List<Object[]> list = tarolt.getResultList();
+        for(Object[] player : list){
+            int id= Integer.parseInt(player[0].toString());
+            CurrentGame cg = em.find(CurrentGame.class, id);
+            players.add(cg);
+        }
+        em.close();
+        return players;
+    
+    }
+    
+    // JSON formátumu returnölés
+    public JSONObject toJson(){
+        JSONObject j = new JSONObject();
+        j.put("id",this.id);
+        j.put("userId",this.userId);
+        j.put("color",this.color);
+        j.put("balance",this.balance);
+        j.put("sumBalance",this.sumBalance);
+        
+        return j;
+    }
+    
+    //Játékos törlése
+    public boolean deleteOnePlayer(Integer id, EntityManager em){
+        try{
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("deleteOnePlayer");
+            spq.registerStoredProcedureParameter("idIN", Integer.class, ParameterMode.IN);
+            
+            spq.setParameter("idIN",id);
+            
+            spq.execute();
+            em.close();
+            return true;
+        }
+        catch(Exception ex){
+            return false;
+        }
+    }
+    
+    
+    
 
     @Override
     public int hashCode() {
