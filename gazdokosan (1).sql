@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2020. Sze 09. 21:29
+-- Létrehozás ideje: 2020. Sze 10. 16:04
 -- Kiszolgáló verziója: 10.4.14-MariaDB
 -- PHP verzió: 7.4.9
 
@@ -33,6 +33,10 @@ DROP PROCEDURE IF EXISTS `addNewScore`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `addNewScore` (IN `scoreIN` INT(8), IN `rankIN` INT(8))  NO SQL
 INSERT INTO `score`(`id`, `score`, `rank`) VALUES (NULL,scoreIN, rankIN)$$
 
+DROP PROCEDURE IF EXISTS `addNewStatistics`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addNewStatistics` (IN `rankIN` INT(8), IN `userIN` INT(8), IN `totalScoreIN` INT(7))  NO SQL
+INSERT INTO `statistics`(`id`, `rank`, `user`, `total_score`) VALUES (NULL,rankIN,userIN, totalScoreIN)$$
+
 DROP PROCEDURE IF EXISTS `addNewUser`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `addNewUser` (IN `usernameIN` VARCHAR(50), IN `passwordIN` VARCHAR(100))  NO SQL
 INSERT INTO `user`(`username`, `password`) VALUES (usernameIN,passwordIN)$$
@@ -40,10 +44,6 @@ INSERT INTO `user`(`username`, `password`) VALUES (usernameIN,passwordIN)$$
 DROP PROCEDURE IF EXISTS `addNewWare`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `addNewWare` (IN `objectIN` VARCHAR(100), IN `priceIN` INT(6))  NO SQL
 INSERT INTO `wares`(`id`, `object`, `price`) VALUES (NULL,objectIN,priceIN)$$
-
-DROP PROCEDURE IF EXISTS `addStatistics`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addStatistics` (IN `rankIN` INT(8), IN `userIN` INT(8), IN `totalScoreIN` INT(7))  NO SQL
-INSERT INTO `statistics`(`id`, `rank`, `user`, `total_score`) VALUES (NULL,rankIN,userIN, totalScoreIN)$$
 
 DROP PROCEDURE IF EXISTS `deleteAllPlayer`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteAllPlayer` ()  NO SQL
@@ -73,8 +73,8 @@ DROP PROCEDURE IF EXISTS `deleteOneScore`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteOneScore` (IN `idIN` INT(8))  NO SQL
 DELETE FROM `score` WHERE `score`.`id` = idIN$$
 
-DROP PROCEDURE IF EXISTS `deleteOneStatistics`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteOneStatistics` (IN `idIN` INT(8))  NO SQL
+DROP PROCEDURE IF EXISTS `deleteOneStatistic`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteOneStatistic` (IN `idIN` INT(8))  NO SQL
 DELETE FROM `statistics` WHERE `statistics`.`id` = idIN$$
 
 DROP PROCEDURE IF EXISTS `deleteOneUser`$$
@@ -133,8 +133,8 @@ DROP PROCEDURE IF EXISTS `updateOneScore`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `updateOneScore` (IN `scoreIN` INT(8), IN `idIN` INT(8))  NO SQL
 UPDATE `score` SET `score`=scoreIN,`rank`=rankIN WHERE `id`=idIN$$
 
-DROP PROCEDURE IF EXISTS `updateOneStatistics`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `updateOneStatistics` (IN `rankIN` INT(8), IN `userIN` INT(8), IN `totalScoreIN` INT(7), IN `idIN` INT(8))  NO SQL
+DROP PROCEDURE IF EXISTS `updateOneStatistic`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateOneStatistic` (IN `rankIN` INT(8), IN `userIN` INT(8), IN `totalScoreIN` INT(7), IN `idIN` INT(8))  NO SQL
 UPDATE `statistics` SET `rank`=rankIN,`user`=userIN,`total_score`=totalScoreIN WHERE `id`= idIN$$
 
 DROP PROCEDURE IF EXISTS `updateOneUser`$$
@@ -215,6 +215,24 @@ CREATE TABLE `statistics` (
   `user` int(8) NOT NULL,
   `total_score` int(7) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- A tábla adatainak kiíratása `statistics`
+--
+
+INSERT INTO `statistics` (`id`, `rank`, `user`, `total_score`) VALUES
+(1, 1, 1, 12345),
+(3, 2, 1, 130),
+(4, 3, 2, 120),
+(5, 4, 3, 110),
+(6, 5, 4, 100),
+(7, 6, 5, 90),
+(8, 7, 6, 80),
+(9, 8, 7, 70),
+(10, 9, 8, 60),
+(11, 10, 9, 50),
+(12, 11, 10, 40),
+(13, 12, 11, 30);
 
 -- --------------------------------------------------------
 
@@ -319,7 +337,7 @@ ALTER TABLE `wares`
 -- AUTO_INCREMENT a táblához `current_game`
 --
 ALTER TABLE `current_game`
-  MODIFY `id` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT a táblához `score`
@@ -331,7 +349,7 @@ ALTER TABLE `score`
 -- AUTO_INCREMENT a táblához `statistics`
 --
 ALTER TABLE `statistics`
-  MODIFY `id` int(8) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT a táblához `user`
@@ -343,7 +361,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT a táblához `wares`
 --
 ALTER TABLE `wares`
-  MODIFY `id` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Megkötések a kiírt táblákhoz
