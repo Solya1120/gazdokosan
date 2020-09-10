@@ -6,9 +6,12 @@
 package Modell;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,9 +19,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.json.JSONObject;
 
 /**
  *
@@ -94,6 +100,76 @@ public class Statistics implements Serializable {
         this.user = user;
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    //Új statisztika hozzáadása
+    public static boolean addNewStatistics(Integer rank, Integer user, Integer totalScore, EntityManager em){
+        try{
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("addNewStatistics");
+            spq.registerStoredProcedureParameter("rankIN", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("userIN", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("totalScoreIN", Integer.class, ParameterMode.IN);
+            
+            spq.setParameter("rankIN", rank);
+            spq.setParameter("userIN", user);
+            spq.setParameter("totalScoreIN", totalScore);
+            
+            spq.execute();
+            em.close();
+            return true;
+        }
+        catch(Exception ex){
+            return false;
+        }
+    
+    }
+    
+    
+    //Összes statisztika kilistázása
+    
+    public static List<Statistics> selectAllStatistics(EntityManager em){
+        List<Statistics> statistics = new ArrayList();
+        StoredProcedureQuery tarolt = em.createStoredProcedureQuery("selectAllStatistics");
+        List<Object[]> list = tarolt.getResultList();
+        for(Object[] statistic : list){
+            int id= Integer.parseInt(statistic[0].toString());
+            Statistics s = em.find(Statistics.class, id);
+            statistics.add(s);
+        }
+        em.close();
+        return statistics;
+    
+    }
+    
+    // JSON formátumu returnölés
+    public JSONObject toJson(){
+        JSONObject j = new JSONObject();
+        j.put("id",this.id);
+        j.put("rank",this.rank);
+        j.put("user",this.user);
+        j.put("totalScore",this.totalScore);
+
+        return j;
+    }
+    
+    //Statisztika törlése
+    public boolean deleteOneStatistic(Integer id, EntityManager em){
+        try{
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("deleteOneStatistic");
+            spq.registerStoredProcedureParameter("idIN", Integer.class, ParameterMode.IN);
+            
+            spq.setParameter("idIN",id);
+            
+            spq.execute();
+            em.close();
+            return true;
+        }
+        catch(Exception ex){
+            return false;
+        }
+    }
+    
+    
     @Override
     public int hashCode() {
         int hash = 0;

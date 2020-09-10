@@ -16,6 +16,10 @@
         <servlet-name>CurrentGameController</servlet-name>
         <servlet-class>Controller.CurrentGameController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>StatisticsController</servlet-name>
+        <servlet-class>Controller.StatisticsController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>UserController</servlet-name>
         <url-pattern>/UserController</url-pattern>
@@ -31,6 +35,10 @@
     <servlet-mapping>
         <servlet-name>CurrentGameController</servlet-name>
         <url-pattern>/CurrentGameController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StatisticsController</servlet-name>
+        <url-pattern>/StatisticsController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
