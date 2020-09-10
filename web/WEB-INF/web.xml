@@ -8,6 +8,10 @@
         <servlet-name>ScoreController</servlet-name>
         <servlet-class>Controller.ScoreController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>WaresController</servlet-name>
+        <servlet-class>Controller.WaresController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>UserController</servlet-name>
         <url-pattern>/UserController</url-pattern>
@@ -15,6 +19,10 @@
     <servlet-mapping>
         <servlet-name>ScoreController</servlet-name>
         <url-pattern>/ScoreController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>WaresController</servlet-name>
+        <url-pattern>/WaresController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
