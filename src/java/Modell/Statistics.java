@@ -36,7 +36,6 @@ import org.json.JSONObject;
 @NamedQueries({
     @NamedQuery(name = "Statistics.findAll", query = "SELECT s FROM Statistics s")
     , @NamedQuery(name = "Statistics.findById", query = "SELECT s FROM Statistics s WHERE s.id = :id")
-    , @NamedQuery(name = "Statistics.findByRank", query = "SELECT s FROM Statistics s WHERE s.rank = :rank")
     , @NamedQuery(name = "Statistics.findByTotalScore", query = "SELECT s FROM Statistics s WHERE s.totalScore = :totalScore")})
 public class Statistics implements Serializable {
 
@@ -48,8 +47,6 @@ public class Statistics implements Serializable {
     private Integer id;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "rank")
-    private int rank;
     @Column(name = "total_score")
     private Integer totalScore;
     @JoinColumn(name = "user", referencedColumnName = "id")
@@ -63,10 +60,6 @@ public class Statistics implements Serializable {
         this.id = id;
     }
 
-    public Statistics(Integer id, int rank) {
-        this.id = id;
-        this.rank = rank;
-    }
 
     public Integer getId() {
         return id;
@@ -74,14 +67,6 @@ public class Statistics implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public int getRank() {
-        return rank;
-    }
-
-    public void setRank(int rank) {
-        this.rank = rank;
     }
 
     public Integer getTotalScore() {
@@ -103,14 +88,12 @@ public class Statistics implements Serializable {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     //Új statisztika hozzáadása
-    public static boolean addNewStatistics(Integer rank, Integer user, Integer totalScore, EntityManager em){
+    public static boolean addNewStatistics(Integer user, Integer totalScore, EntityManager em){
         try{
             StoredProcedureQuery spq = em.createStoredProcedureQuery("addNewStatistics");
-            spq.registerStoredProcedureParameter("rankIN", Integer.class, ParameterMode.IN);
             spq.registerStoredProcedureParameter("userIN", Integer.class, ParameterMode.IN);
             spq.registerStoredProcedureParameter("totalScoreIN", Integer.class, ParameterMode.IN);
             
-            spq.setParameter("rankIN", rank);
             spq.setParameter("userIN", user);
             spq.setParameter("totalScoreIN", totalScore);
             
@@ -145,7 +128,6 @@ public class Statistics implements Serializable {
     public JSONObject toJson(){
         JSONObject j = new JSONObject();
         j.put("id",this.id);
-        j.put("rank",this.rank);
         j.put("user",this.user);
         j.put("totalScore",this.totalScore);
 
@@ -169,6 +151,43 @@ public class Statistics implements Serializable {
         }
     }
     
+    //Egy statisztika kiírása
+    public static Statistics selectOneStatistics(Integer id, EntityManager em){
+        Statistics s = new Statistics();
+        StoredProcedureQuery spq = em.createStoredProcedureQuery("selectOneStatistics");
+        spq.registerStoredProcedureParameter("idIN", Integer.class, ParameterMode.IN);
+        spq.setParameter("idIN",id);
+       
+        
+        s = em.find(Statistics.class, id);
+        spq.execute();
+        em.close();
+        return s;
+    
+    }
+    
+    //Ranglista kilistázása    
+    public static List<Statistics> selectAllStatisticsDESC(EntityManager em){
+        List<Statistics> statistics = new ArrayList();
+        StoredProcedureQuery tarolt = em.createStoredProcedureQuery("selectAllStatisticsDESC");
+        List<Object[]> list = tarolt.getResultList();
+        for(Object[] statistic : list){
+            int id= Integer.parseInt(statistic[0].toString());
+            Statistics s = em.find(Statistics.class, id);
+            statistics.add(s);
+        }
+        em.close();
+        return statistics;
+    
+    }
+    
+    
+    //Top 3 felhasználó nevekkel
+    public static List<Object[]> joinTop3Statistics(EntityManager em){
+        StoredProcedureQuery spq = em.createStoredProcedureQuery("joinTop3Statistics");
+        List<Object[]> list = spq.getResultList();
+        return list;
+    }
     
     @Override
     public int hashCode() {

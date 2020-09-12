@@ -4,6 +4,7 @@ import Modell.User;
 import Service.CurrentGameService;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -96,6 +97,60 @@ public class CurrentGameController extends HttpServlet {
                out.print(answer.toString());
             }
             
+            //Egy játékos kirása
+            if(request.getParameter("task").equals("selectOnePlayer")){
+                Integer id = Integer.parseInt(request.getParameter("id"));
+                JSONObject result = cgs.selectOnePlayer(id,em);
+                out.print(result.toString());
+            }
+            
+            
+            
+            //Ranglista kilistázása
+            if(request.getParameter("task").equals("selectAllPlayerDESC")){
+                JSONArray result = cgs.selectAllPlayerDESC(em);
+                out.print(result.toString());
+            }
+            
+            
+            //Aktuális játékos adatai felhasználó név alapján
+            if(request.getParameter("task").equals("checkPlayerByUsername")){
+                String username = request.getParameter("username");
+                List<Object[]> list = cgs.checkPlayerByUsername(username, em);
+                JSONArray valasz =new JSONArray();
+                if(list.size() > 0){
+                    for(Object[] o : list){
+                        JSONObject player = new JSONObject();
+                        player.put("Username",o[0].toString());
+                        player.put("Color",o[1].toString());
+                        player.put("Balance",o[2].toString());
+                        valasz.put(player);
+                    }
+                } 
+                else{
+                    valasz.put("Nincs ilyen nevű felhasználó");
+                }
+                out.print(valasz.toString());
+            }
+            
+            
+            
+            //Azok a felhasználók, akik éppen nincsenek játékban
+            if(request.getParameter("task").equals("selectUserNotPlayer")){
+                List<Object[]> list = cgs.selectUserNotPlayer(em);
+                JSONArray valasz = new JSONArray();
+                if(list.size() > 0){
+                    for(Object[] o : list){
+                        JSONObject users = new JSONObject();
+                        users.put("username",o[0].toString());
+                        valasz.put(users);
+                    }
+                }
+                else{
+                    valasz.put("Minden felhasználó játékban van.");
+                }
+                out.print(valasz.toString());
+            }
         }
     }
 

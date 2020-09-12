@@ -4,6 +4,7 @@ import Modell.User;
 import Service.StatisticsService;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -31,13 +32,12 @@ public class StatisticsController extends HttpServlet {
             
             // Új statisztika hozzáadása
             if(request.getParameter("task").equals("addNewStatistics")){
-             if(!request.getParameter("rank").isEmpty() && !request.getParameter("user").isEmpty() && !request.getParameter("totalScore").isEmpty()) {
-                   Integer rank = Integer.parseInt(request.getParameter("rank"));
+             if(!request.getParameter("user").isEmpty() && !request.getParameter("totalScore").isEmpty()) {
                    Integer user = Integer.parseInt(request.getParameter("user"));
                    Integer totalScore = Integer.parseInt(request.getParameter("totalScore"));
 
                    
-                   if(ss.addNewStatistics(rank, user, totalScore, em)){
+                   if(ss.addNewStatistics(user, totalScore, em)){
                        answer.put("msg", "Sikeresen hozzáadtad a statisztikát");
                    }
                    else{
@@ -65,11 +65,10 @@ public class StatisticsController extends HttpServlet {
                    
                    user.setId(Integer.parseInt(request.getParameter("user"))) ;
                    Integer id = Integer.parseInt(request.getParameter("id"));
-                   Integer rank = Integer.parseInt(request.getParameter("rank"));
                    Integer totalScore = Integer.parseInt(request.getParameter("totalScore"));
                    
                    
-                   if(ss.updateOneStatistic(user, rank, totalScore, id, em)){
+                   if(ss.updateOneStatistic(user, totalScore, id, em)){
                        answer.put("msg", "Sikeres módosítás");
                    }
                    else{
@@ -88,6 +87,36 @@ public class StatisticsController extends HttpServlet {
                    answer.put("msg", "Hiba");
                }
                out.print(answer.toString());
+            }
+            
+            
+            //Egy statisztika kirása
+            if(request.getParameter("task").equals("selectOneStatistics")){
+                Integer id = Integer.parseInt(request.getParameter("id"));
+                JSONObject result = ss.selectOneStatistics(id,em);
+                out.print(result.toString());
+            }
+            
+            //Ranglista kilistázása
+            if(request.getParameter("task").equals("selectAllStatisticsDESC")){
+                JSONArray result = ss.selectAllStatisticsDESC(em);
+                out.print(result.toString());
+            }
+            
+            //Top 3 felhasználó nevekkel
+            if(request.getParameter("task").equals("joinTop3Statistics")){
+                List<Object[]> list = ss.joinTop3Statistics(em);
+                JSONArray valasz = new JSONArray();
+                if(list.size() > 0){
+                    for(Object[] o : list){
+                        JSONObject statistics = new JSONObject();
+                        statistics.put("username",o[0].toString());
+                        statistics.put("id",o[1].toString());
+                        statistics.put("totalScore",o[2].toString());
+                        valasz.put(statistics);
+                    }
+                }
+                out.print(valasz.toString());
             }
         }
     }

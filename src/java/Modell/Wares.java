@@ -153,6 +153,21 @@ public class Wares implements Serializable {
         }
     }
     
+     
+     //3 legdrágább áru kilistázása    
+    public static List<Wares> selectTop3Wares(EntityManager em){
+        List<Wares> wares = new ArrayList();
+        StoredProcedureQuery tarolt = em.createStoredProcedureQuery("selectTop3Wares");
+        List<Object[]> list = tarolt.getResultList();
+        for(Object[] ware : list){
+            int id= Integer.parseInt(ware[0].toString());
+            Wares w = em.find(Wares.class, id);
+            wares.add(w);
+        }
+        em.close();
+        return wares;
+    
+    }
     
     @Override
     public int hashCode() {

@@ -1,5 +1,6 @@
 package Service;
 
+import Modell.CurrentGame;
 import Modell.Wares;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -58,5 +59,15 @@ public class WaresService {
             return false;
         }
         
+    }
+     
+     //3 legdrágább áru kilistázása
+    public JSONArray selectTop3Wares(EntityManager em){
+        List<Wares> wares = Wares.selectTop3Wares(em);
+        JSONArray top3Wares = new JSONArray();
+        for(Wares ware : wares){
+            top3Wares.put(ware.toJson());
+        }
+        return top3Wares;
     }
 }

@@ -6,12 +6,13 @@ import Modell.User;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class StatisticsService {
     // Új statisztika hozzáadása
-    public  boolean addNewStatistics(Integer rank, Integer user, Integer totalScore, EntityManager em){
-         if(rank > 0 && user > 0 && totalScore > 0 ){
-            if(Statistics.addNewStatistics(rank, user, totalScore, em)){
+    public  boolean addNewStatistics( Integer user, Integer totalScore, EntityManager em){
+         if(user > 0 && totalScore > 0 ){
+            if(Statistics.addNewStatistics(user, totalScore, em)){
                 return true;
             }
             else{
@@ -34,13 +35,12 @@ public class StatisticsService {
     }
     
     //Statisztika módosítása
-    public boolean updateOneStatistic(User user, Integer rank,Integer totalScore, Integer id, EntityManager em){
+    public boolean updateOneStatistic(User user,Integer totalScore, Integer id, EntityManager em){
         try{
         Statistics s = em.find(Statistics.class, id);
         
             em.getTransaction().begin();
             s.setUser(user);
-            s.setRank(rank);
             s.setTotalScore(totalScore);
             em.getTransaction().commit();
             return true;
@@ -59,7 +59,32 @@ public class StatisticsService {
         }
         else{
             return false;
-        }
-        
+        }   
     }
+    
+    
+    //Egy statisztika kiírása
+    public JSONObject selectOneStatistics(Integer id, EntityManager em){
+        Statistics s = Statistics.selectOneStatistics(id, em);
+        JSONObject st = s.toJson();
+        return st;
+    }
+    
+    //Ranglista kilistázása
+    public JSONArray selectAllStatisticsDESC(EntityManager em){
+        List<Statistics> statistics = Statistics.selectAllStatisticsDESC(em);
+        JSONArray ranking = new JSONArray();
+        for(Statistics statistic : statistics){
+            ranking.put(statistic.toJson());
+        }
+        return ranking;
+    }
+    
+    
+    //Top 3 felhasználó nevekkel
+    public List<Object[]> joinTop3Statistics( EntityManager em){
+        return Statistics.joinTop3Statistics(em);
+    }
+    
+    
 }

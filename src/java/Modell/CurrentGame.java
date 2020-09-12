@@ -21,6 +21,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 @Entity
@@ -174,9 +175,66 @@ public class CurrentGame implements Serializable {
         }
     }
     
+    //Egy játékos kilistázása
+    public static CurrentGame selectOnePlayer(Integer id, EntityManager em){
+        CurrentGame player = new CurrentGame();
+        StoredProcedureQuery spq = em.createStoredProcedureQuery("selectOnePlayer");
+        spq.registerStoredProcedureParameter("idIN", Integer.class, ParameterMode.IN);
+        spq.setParameter("idIN",id);
+       
+        
+        player = em.find(CurrentGame.class, id);
+        spq.execute();
+        em.close();
+        return player;
     
-    
+    }
 
+    
+    //Játékosok aktuális ranglistája készpénzt kilistázása    
+    public static List<CurrentGame> selectAllPlayerDESC(EntityManager em){
+        List<CurrentGame> players = new ArrayList();
+        StoredProcedureQuery tarolt = em.createStoredProcedureQuery("selectAllPlayerDESC");
+        List<Object[]> list = tarolt.getResultList();
+        for(Object[] player : list){
+            int id= Integer.parseInt(player[0].toString());
+            CurrentGame cg = em.find(CurrentGame.class, id);
+            players.add(cg);
+        }
+        em.close();
+        return players;
+    
+    }
+    
+    
+    //Aktuális játékos adatai felhasználó név alapján
+    public static List<Object[]> checkPlayerByUsername(String username, EntityManager em){
+        StoredProcedureQuery spq = em.createStoredProcedureQuery("checkPlayerByUsername");
+        spq.registerStoredProcedureParameter("usernameIN", String.class, ParameterMode.IN);
+        spq.setParameter("usernameIN", username);
+        List<Object[]> list = spq.getResultList();
+        return list;
+    }
+    
+    
+   
+    //Azok a felhasználók, akik éppen nincsenek játékban
+    public static List<Object[]> selectUserNotPlayer(EntityManager em){
+        StoredProcedureQuery spq = em.createStoredProcedureQuery("selectUserNotPlayer");
+        List<Object[]> list = spq.getResultList();
+        return list;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     @Override
     public int hashCode() {
         int hash = 0;

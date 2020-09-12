@@ -3,9 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/solya/OneDrive/Dokumentumok/NetBeansProjects/gazdalkodjokosan/src/java/Service/ScoreService.java</file>
-            <file>file:/C:/Users/solya/OneDrive/Dokumentumok/NetBeansProjects/gazdalkodjokosan/src/java/Modell/Score.java</file>
-            <file>file:/C:/Users/solya/OneDrive/Dokumentumok/NetBeansProjects/gazdalkodjokosan/src/java/Controller/ScoreController.java</file>
+            <file>file:/C:/Users/solya/OneDrive/Dokumentumok/NetBeansProjects/gazdalkodjokosan/src/java/Controller/StatisticsController.java</file>
+            <file>file:/C:/Users/solya/OneDrive/Dokumentumok/NetBeansProjects/gazdalkodjokosan/src/java/Service/StatisticsService.java</file>
+            <file>file:/C:/Users/solya/OneDrive/Dokumentumok/NetBeansProjects/gazdalkodjokosan/src/java/Modell/Statistics.java</file>
         </group>
     </open-files>
 </project-private>

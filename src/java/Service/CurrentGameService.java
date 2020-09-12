@@ -5,6 +5,7 @@ import Modell.User;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class CurrentGameService {
      // Új játékos hozzáadása
@@ -32,6 +33,16 @@ public class CurrentGameService {
         return allPlayers;
     }
     
+    
+    //Játékosok aktuális ranglistája készpénzt kilistázása    
+    public JSONArray selectAllPlayerDESC(EntityManager em){
+        List<CurrentGame> players = CurrentGame.selectAllPlayerDESC(em);
+        JSONArray ranking = new JSONArray();
+        for(CurrentGame player : players){
+            ranking.put(player.toJson());
+        }
+        return ranking;
+    }
     
     
     //Játékos módosítása
@@ -64,6 +75,23 @@ public class CurrentGameService {
             return false;
         }
         
+    }
+    
+    //Egy játékos kiírása
+    public JSONObject selectOnePlayer(Integer id, EntityManager em){
+        CurrentGame player = CurrentGame.selectOnePlayer(id,em);
+        JSONObject p = player.toJson();
+        return p;
+    }
+
+    //Aktuális játékos adatai felhasználó név alapján
+    public List<Object[]> checkPlayerByUsername(String username, EntityManager em){
+        return CurrentGame.checkPlayerByUsername(username, em);
+    }
+    
+    //Azok a felhasználók, akik éppen nincsenek játékban
+    public List<Object[]> selectUserNotPlayer( EntityManager em){
+        return CurrentGame.selectUserNotPlayer(em);
     }
     
     

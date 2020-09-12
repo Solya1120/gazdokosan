@@ -81,7 +81,11 @@ public class WaresController extends HttpServlet {
                out.print(answer.toString());
             }
             
-            
+            //3 Legdrágább áru kilistázása
+            if(request.getParameter("task").equals("selectTop3Wares")){
+                JSONArray result = ws.selectTop3Wares(em);
+                out.print(result.toString());
+            }
             
             
             

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2020. Sze 10. 16:04
+-- Létrehozás ideje: 2020. Sze 12. 14:13
 -- Kiszolgáló verziója: 10.4.14-MariaDB
 -- PHP verzió: 7.4.9
 
@@ -45,6 +45,14 @@ DROP PROCEDURE IF EXISTS `addNewWare`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `addNewWare` (IN `objectIN` VARCHAR(100), IN `priceIN` INT(6))  NO SQL
 INSERT INTO `wares`(`id`, `object`, `price`) VALUES (NULL,objectIN,priceIN)$$
 
+DROP PROCEDURE IF EXISTS `checkPlayerByUsername`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `checkPlayerByUsername` (IN `usernameIN` VARCHAR(50))  NO SQL
+SELECT `user`.`username`, `current_game`.`color`,`current_game`.`balance`
+FROM `user`
+RIGHT JOIN `current_game`
+ON `user`.`id`=`current_game`.`user_id`
+WHERE `user`.`username`= usernameIN$$
+
 DROP PROCEDURE IF EXISTS `deleteAllPlayer`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteAllPlayer` ()  NO SQL
 DELETE FROM `current_game`$$
@@ -85,9 +93,24 @@ DROP PROCEDURE IF EXISTS `deleteOneWare`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteOneWare` (IN `idIN` INT(8))  NO SQL
 DELETE FROM `wares` WHERE `wares`.`id`=idIN$$
 
+DROP PROCEDURE IF EXISTS `joinTop3Statistics`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `joinTop3Statistics` ()  NO SQL
+SELECT `user`.`username`, `statistics`.`id`, `statistics`.`total_score`
+FROM `user`
+INNER JOIN `statistics`
+ON `user`.`id` = `statistics`.`user`
+ORDER BY `statistics`.`total_score` DESC
+LIMIT 3$$
+
 DROP PROCEDURE IF EXISTS `selectAllPlayer`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `selectAllPlayer` ()  NO SQL
 SELECT * FROM `current_game`$$
+
+DROP PROCEDURE IF EXISTS `selectAllPlayerDESC`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `selectAllPlayerDESC` ()  NO SQL
+SELECT *
+FROM `current_game`
+ORDER By current_game.balance DESC$$
 
 DROP PROCEDURE IF EXISTS `selectAllScore`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `selectAllScore` ()  NO SQL
@@ -96,6 +119,12 @@ SELECT * FROM `score`$$
 DROP PROCEDURE IF EXISTS `selectAllStatistics`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `selectAllStatistics` ()  NO SQL
 SELECT * FROM `statistics`$$
+
+DROP PROCEDURE IF EXISTS `selectAllStatisticsDESC`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `selectAllStatisticsDESC` ()  NO SQL
+SELECT * 
+FROM `statistics`
+ORDER BY `statistics`.`total_score` DESC$$
 
 DROP PROCEDURE IF EXISTS `selectAllUser`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `selectAllUser` ()  NO SQL
@@ -124,6 +153,21 @@ SELECT * FROM `user` WHERE `user`.`id`=idIN$$
 DROP PROCEDURE IF EXISTS `selectOneWare`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `selectOneWare` (IN `idIN` INT(8))  NO SQL
 SELECT * FROM `wares` WHERE `wares`.`id`=idIN$$
+
+DROP PROCEDURE IF EXISTS `selectTop3Wares`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `selectTop3Wares` ()  NO SQL
+SELECT *
+FROM `wares`
+ORDER BY `wares`.`price` DESC
+LIMIT 3$$
+
+DROP PROCEDURE IF EXISTS `selectUserNotPlayer`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `selectUserNotPlayer` ()  NO SQL
+SELECT `user`.`username`
+FROM `user`
+LEFT JOIN `current_game`
+ON `user`.`id` = `current_game`.`user_id`
+WHERE `current_game`.`user_id` IS NULL$$
 
 DROP PROCEDURE IF EXISTS `updateOnePlayer`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `updateOnePlayer` (IN `userIdIN` INT(8), IN `colorIN` VARCHAR(25), IN `balanceIN` INT(8), IN `sumBalanceIN` INT(8), IN `rankIN` INT(8), IN `idIN` INT(8))  NO SQL
@@ -211,7 +255,6 @@ INSERT INTO `score` (`id`, `score`, `rank`) VALUES
 DROP TABLE IF EXISTS `statistics`;
 CREATE TABLE `statistics` (
   `id` int(8) NOT NULL,
-  `rank` int(8) NOT NULL,
   `user` int(8) NOT NULL,
   `total_score` int(7) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -220,19 +263,19 @@ CREATE TABLE `statistics` (
 -- A tábla adatainak kiíratása `statistics`
 --
 
-INSERT INTO `statistics` (`id`, `rank`, `user`, `total_score`) VALUES
-(1, 1, 1, 12345),
-(3, 2, 1, 130),
-(4, 3, 2, 120),
-(5, 4, 3, 110),
-(6, 5, 4, 100),
-(7, 6, 5, 90),
-(8, 7, 6, 80),
-(9, 8, 7, 70),
-(10, 9, 8, 60),
-(11, 10, 9, 50),
-(12, 11, 10, 40),
-(13, 12, 11, 30);
+INSERT INTO `statistics` (`id`, `user`, `total_score`) VALUES
+(1, 1, 12345),
+(3, 1, 130),
+(4, 2, 120),
+(5, 3, 110),
+(6, 4, 100),
+(7, 5, 90),
+(8, 6, 80),
+(9, 7, 70),
+(10, 8, 60),
+(11, 9, 50),
+(12, 10, 40),
+(13, 11, 30);
 
 -- --------------------------------------------------------
 
